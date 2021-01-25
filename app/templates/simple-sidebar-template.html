@@ -81,21 +81,19 @@
   {% block script %}
   {% endblock %}
 
-  <footer>
+  <footer class="footer">
     <div class="container">
       <div class="row">
+          <div class="col-sm-2"></div>
           <div class="col-sm-4">
-              &copy; KW Rink Scheduler. Open Source Project.
+            <a class="btn btn-mini btn-link " href="{{ url_for('about_page')}}">About</a>
           </div>
-           <div class="col-sm-8">
-              <ul class="pull-right">
-                  <li><a class="btn btn-mini btn-link " href="{{ url_for('about_page')}}">About</a></li>
-                  <li><a class="btn btn-mini btn-link " href="https://github.com/fras2560/outdoor-rink-scheduler"> Project</a></li>
-              </ul>
+          <div class="col-sm-4">
+            <a class="btn btn-mini btn-link " href="https://github.com/fras2560/outdoor-rink-scheduler"> Project</a>
           </div>
+          <div class="col-sm-2"></div>
       </div>
-  </div>
-
+    </div>
   </footer>
 </body>
 
