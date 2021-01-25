@@ -1,0 +1,18 @@
+{% extends "simple-sidebar-template.html" %}
+{% block content %}
+<h1 data-cy="welcomeHeader">
+  About the app
+</h1>
+<br>
+
+<p data-cy="welcomeMessage">
+    This app was made to help people book a time on the local KW outdoor rinks. Additionally, can be used to check the status of the rink.
+    Your cooperation is greatly appreciated. The app is open source and the source can be found on <a href="https://github.com/fras2560/outdoor-rink-scheduler">Github</a>.
+    The code is hosted on Heroku. Email is only collected in a way to help identify you when booking.
+</p>
+
+<p data-cy="welcomeMessage">
+    The app is maintained by Dallas Fraser.
+    Feel free to send an <a href="mailto:dallas.fraser.waterloo@gmail.com?subject=KW Outdoor Rink App">email</a> with suggestions how it could be improved
+</p>
+{% endblock %}

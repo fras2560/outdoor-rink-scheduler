@@ -1,0 +1,16 @@
+{% extends "simple-sidebar-template.html" %}
+{% block content %}
+<h1 data-cy="rinkHeader">
+    {{rink.name}}
+</h1>
+{% if rink.status %}
+    <h2>
+
+        {{rink.status}}
+    </h2>
+{% endif %}
+<p>
+  TODO select a time
+</p>
+
+{% endblock %}

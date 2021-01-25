@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="A simple app to keep you update on local outdoor rink and schedule a time">
+  <meta name="author" content="DJF">
+  {% if title %}
+    <title>{{title}}</title>
+  {% else %}
+    <title>KW - Rink Scheduler</title>
+  {% endif %}
+  <!-- Custom CSS -->
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    
+  <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/simple-sidebar.css') }}" rel="stylesheet">
+  {% block header %}
+  {% endblock %}
+</head>
+
+{% if page %}
+  <body title="{{page}}" lang="en">
+{% else %}
+  <body title="home" lang="en">
+{% endif %}
+
+  <div class="d-flex" id="wrapper">
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+
+      <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
+            <li class="nav-item active">
+              <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Link</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Dropdown
+              </a>
+              <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="#">Action</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Something else here</a>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="container">
+        {% block content %}
+        {% endblock %}
+      </div>
+    </div>
+    <!-- /#page-content-wrapper -->
+
+  </div>
+  <!-- /#wrapper -->
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/bootstrap.bundle.min.js') }}"></script>
+
+  <!-- Menu Toggle Script -->
+  <script>
+    $("#menu-toggle").click(function(e) {
+      e.preventDefault();
+      $("#wrapper").toggleClass("toggled");
+    });
+  </script>
+  {% block script %}
+  {% endblock %}
+
+  <footer>
+    <div class="container">
+      <div class="row">
+          <div class="col-sm-4">
+              &copy; KW Rink Scheduler. Open Source Project.
+          </div>
+           <div class="col-sm-8">
+              <ul class="pull-right">
+                  <li><a class="btn btn-mini btn-link " href="{{ url_for('about_page')}}">About</a></li>
+                  <li><a class="btn btn-mini btn-link " href="https://github.com/fras2560/outdoor-rink-scheduler"> Project</a></li>
+              </ul>
+          </div>
+      </div>
+  </div>
+
+  </footer>
+</body>
+
+</html>
