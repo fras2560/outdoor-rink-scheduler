@@ -1,7 +1,7 @@
 from app import APP
-from app.model import DB, Entity
+from app.model import DB, Rink
 
-MOCK_DATA = ["dog", "human", "liberty"]
+MOCK_DATA = ["Glendale Park"]
 
 
 def init_database():
@@ -11,8 +11,8 @@ def init_database():
         DB.create_all()
         # add a few entities
         for name in MOCK_DATA:
-            entity = Entity(name)
-            DB.session.add(entity)
+            rink = Rink(name)
+            DB.session.add(rink)
         DB.session.commit()
 
 
