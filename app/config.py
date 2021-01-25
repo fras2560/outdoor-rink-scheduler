@@ -13,6 +13,7 @@ class Config(object):
     USE_SESSION_FOR_NEXT = True
     TESTING = os.environ.get("TESTING", False)
     DEBUG = os.environ.get("DEBUG", False)
+    COVID_LOCKDOWN = os.environ.get("COVID", False)
 
 
 class TestConfig(object):
@@ -24,3 +25,4 @@ class TestConfig(object):
     USE_SESSION_FOR_NEXT = True
     TESTING = True
     DEBUG = True
+    COVID_LOCKDOWN = True

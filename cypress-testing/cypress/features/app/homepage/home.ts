@@ -6,8 +6,8 @@ const navigateToRoot = (): void => {
 };
 Given(`I am on the root page`, navigateToRoot);
 
-/** Assert hello world is visible. */
-const assertHelloWorld = (): void => {
-    cy.findByRole('heading', { name: /hello world/i }).should('be.visible');
+/** Assert header that welcomes the user. */
+const assertWelcomed = (): void => {
+    cy.findByRole('heading', { name: /welcome/i }).should('be.visible');
 };
-When(`I see hello world`, assertHelloWorld);
+When(`I am welcomed`, assertWelcomed);

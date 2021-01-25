@@ -1,0 +1,20 @@
+{% extends "simple-sidebar-template.html" %}
+{% block content %}
+<h1 data-cy="welcomeHeader">
+    Welcome to  KW rink scheduler
+</h1>
+<p>
+  Select a rink to see its status and book a skating time.
+  <ul data-cy="listOfRinks">
+    {% for rink in rinks %}
+      <li data-cy="rink{{rink.id}}">
+        <a href={{ url_for('rink_page', rink_id=rink.id) }}>
+          {{rink.name}}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+  <br>
+</p>
+
+{% endblock %}
