@@ -14,6 +14,16 @@ class Config(object):
     TESTING = os.environ.get("TESTING", False)
     DEBUG = os.environ.get("DEBUG", False)
     COVID_LOCKDOWN = os.environ.get("COVID", False)
+    GOOGLE_OAUTH_CLIENT_ID = os.environ.get("GOOGLE_OAUTH_CLIENT_ID", "")
+    GOOGLE_OAUTH_CLIENT_SECRET = os.environ.get(
+        "GOOGLE_OAUTH_CLIENT_SECRET", "")
+    FACEBOOK_OAUTH_CLIENT_ID = os.environ.get("FACEBOOK_OAUTH_CLIENT_ID", "")
+    FACEBOOK_OAUTH_CLIENT_SECRET = os.environ.get(
+        "FACEBOOK_OAUTH_CLIENT_SECRET", "")
+    GITHUB_OAUTH_CLIENT_ID = os.environ.get("GITHUB_OAUTH_CLIENT_ID", "")
+    GITHUB_OAUTH_CLIENT_SECRET = os.environ.get(
+        "GITHUB_OAUTH_CLIENT_SECRET", "")
+    USE_SESSION_FOR_NEXT = True
 
 
 class TestConfig(object):
@@ -26,3 +36,10 @@ class TestConfig(object):
     TESTING = True
     DEBUG = True
     COVID_LOCKDOWN = True
+    GOOGLE_OAUTH_CLIENT_ID = ""
+    GOOGLE_OAUTH_CLIENT_SECRET = ""
+    FACEBOOK_OAUTH_CLIENT_ID = ""
+    FACEBOOK_OAUTH_CLIENT_SECRET = ""
+    GITHUB_OAUTH_CLIENT_ID = ""
+    GITHUB_OAUTH_CLIENT_SECRET = ""
+    USE_SESSION_FOR_NEXT = True

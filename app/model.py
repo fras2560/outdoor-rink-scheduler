@@ -5,6 +5,7 @@ from sqlalchemy import and_
 from dateutil import tz
 from flask_login import UserMixin
 from datetime import datetime, timedelta
+from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 
 
 """The database object."""
@@ -116,7 +117,13 @@ class User(UserMixin, DB.Model):
         }
 
     def __str__(self):
-        return self.name
+        return self.email
+
+
+class OAuth(OAuthConsumerMixin, DB.Model):
+    provider_user_id = DB.Column(DB.String(256), unique=True, nullable=False)
+    user_id = DB.Column(DB.Integer, DB.ForeignKey('user.id'), nullable=False)
+    user = DB.relationship(User)
 
 
 class Status(DB.Model):

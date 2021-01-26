@@ -1,6 +1,6 @@
 from flask import render_template, session, url_for, redirect
 from app import APP
-from app.errors import NotFoundException
+from app.errors import NotFoundException, OAuthException
 from app.logging import LOGGER
 import traceback
 
@@ -14,11 +14,13 @@ def handle_generic_error():
     return render_template("error.html", message=message)
 
 
+@APP.errorhandler(OAuthException)
 @APP.errorhandler(NotFoundException)
 @APP.errorhandler(Exception)
 def error_request_director(error):
     """Redirect all errors to their handler to prevent double submits"""
-    if (isinstance(error, NotFoundException)):
+    if (isinstance(error, NotFoundException) or
+            isinstance(error, OAuthException)):
         session["runtimeException"] = str(error)
         return redirect(url_for("handle_generic_error"))
     else:

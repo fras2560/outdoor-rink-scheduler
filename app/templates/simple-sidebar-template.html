@@ -42,6 +42,7 @@
             <li class="nav-item">
               <a class="nav-link" href="#">Link</a>
             </li>
+
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Dropdown
@@ -53,6 +54,19 @@
                 <a class="dropdown-item" href="#">Something else here</a>
               </div>
             </li>
+            {% if current_user.is_authenticated %}
+              <li class="nav-item" title="logout">
+                <a class="nav-link" href="{{url_for('logout') }}" data-cy="logout" title="logout">
+                  Logout
+                </a>
+              </li>
+            {% else %}
+              <li class="nav-item" title="login">
+                <a class="nav-link" href="{{url_for('loginpage') }}" data-cy="login" title="Login">
+                  Login
+                </a>
+              </li>
+            {% endif %}
           </ul>
         </div>
       </nav>
