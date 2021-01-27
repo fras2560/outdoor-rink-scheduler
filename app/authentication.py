@@ -11,7 +11,6 @@ from flask_dance.consumer.storage.sqla import SQLAlchemyStorage
 from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_login import LoginManager, current_user, login_user
 from sqlalchemy.orm.exc import NoResultFound
-from sqlalchemy import func
 from app.errors import OAuthException
 from app.model import DB, OAuth, User
 from app.logging import LOGGER
