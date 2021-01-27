@@ -5,3 +5,8 @@
 class NotFoundException(Exception):
     """An exception occurred when looking for some model entity."""
     pass
+
+
+class OAuthException(Exception):
+    """An exception while dealing with oauth provider."""
+    pass
