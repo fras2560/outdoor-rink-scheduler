@@ -21,5 +21,6 @@ DB.init_app(APP)
 login_manager.init_app(APP)
 
 # needs to be imported at end to avoid circular dependency
-from app.views import *
-from app.error_handling import handle_generic_error
+with APP.app_context():
+    from app.views import *
+    from app.error_handling import handle_generic_error

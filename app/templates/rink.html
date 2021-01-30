@@ -1,16 +1,137 @@
 {% extends "simple-sidebar-template.html" %}
+{% block header %}
+    <link href="{{ url_for('static', filename='css/rink.css') }}" rel="stylesheet">
+{% endblock %}
+
 {% block content %}
-<h1 data-cy="rinkHeader">
-    {{rink.name}}
-</h1>
-{% if rink.status %}
-    <h2>
+    <center>
+        <h1 data-cy="rinkHeader">
+            {{rink.name}}
+            {% if status is none %}
+                <i class="fa fa-question-circle-o orange" aria-hidden="true" title="Unknown"></i>
+            {% elif status.open %}
+                <i class="fa fa-check green" aria-hidden="true" title="Open"></i>
+            {% else %}
+                <i class="fa fa-times-circle-o red" aria-hidden="true"  title="Closed"></i>
+            {% endif %}
+        </h1>
+        {% if status is not none %}
+            <p>    
+                <strong>
+                    {{status.state}}
+                </strong>
+                <br>
+                {{status.description}}
+                <br>
+                <small>
+                    Last updated: {{status.start_date}}
+                </small>
+            </p>
+        {% endif %}
+    </center>
+    <div class="row">
+        <div class="col-sm-6" style="min-height: 400px;">
+            <iframe
+                src="{{ rink.map_link|safe }}"
+                width="100%"
+                height="100%"
+                frameborder="0"
+                style="border:0;"
+                allowfullscreen=""
+                aria-hidden="false"
+                tabindex="0"
+                role="img"
+                title="Google Map">
+            </iframe>
+        </div>
+        <div class="col-sm-6">
+            <center>
+                {% if current_user.is_authenticated and (status is none or status.open) %}
+                    <h2>
+                    Book an available time today:
+                    </h2>
+                    <ul>
+                        {% for timeslot in timeslots %}
+                            <li class="timeslot" id="booking{{timeslot.time}}">
+                                {% if timeslot.booked %}
+                                    <button class="btn btn-warning" disabled>
+                                        Full
+                                    </button>
+                                    {{timeslot.time}}
+                                    <i class="fa fa-lock" aria-hidden="true"></i>
+                                {% elif timeslot.user_booked %}
+                                    <button class="btn btn-info" disabled>
+                                        Booked
+                                    </button>
+                                    {{timeslot.time}}
+                                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                                {% else %}
+                                    <button
+                                        onclick="book_timeslot({{timeslot.time}}, {{rink.id}})"
+                                        class="btn btn-success">
+                                        Book
+                                    </button>
+                                    {{timeslot.time}}
+                                    <i class="fa fa-clock-o" aria-hidden="true" title></i>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% elif not current_user.is_authenticated%}
+                    <p>
+                        Sign in to book a timeslot:
+                        <br>
+                        <a
+                            href="{{ url_for('rink_redirect_to_login', rink_id=rink.id) }}"
+                            class="btn btn-primary">
+                            Login
+                        </a>
+                    </p>
+                {% else %}
+                    <p>
+                        Check in later when the rink opens to book a timeslot
+                    </p>
+                {% endif %}
+            </center>
+        </div>
+    </div>
 
-        {{rink.status}}
-    </h2>
-{% endif %}
-<p>
-  TODO select a time
-</p>
-
+    <script>
+        function book_timeslot(hour, rink_id) {
+            $.ajax({
+            type: "POST",
+            url: "{{ url_for('book_timeslot') }}",
+            contentType: "application/json",
+            dataType: "json",
+            data: JSON.stringify({
+                'hour': hour,
+                'rink_id': rink_id
+            }),
+            async: true,
+            success: function(booking) {
+                $(`#booking${hour}`).html(`
+                        <button class="btn btn-info" disabled>
+                            Booked
+                        </button>
+                        ${hour}
+                        <i class="fa fa-calendar" aria-hidden="true"></i>`);
+            }, error: function(request, error) {
+                if (request.status == 403 &&
+                        request.responseJSON == "Have booked too many timeslots today") {
+                    alert("Sorry you have reached your daily limit of bookings");
+                } else if (request.status == 403) {
+                    alert("Sorry this timeslot has been fillled");
+                }
+                $(`#booking${hour}`).html(`
+                        <button class="btn btn-warning" disabled>
+                            Full
+                        </button>
+                            ${hour}
+                        <i class="fa fa-lock" aria-hidden="true"></i>`
+                );
+            }
+        });
+        
+        }
+    </script>
 {% endblock %}

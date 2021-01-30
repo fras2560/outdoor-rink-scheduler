@@ -24,6 +24,8 @@ class Config(object):
     GITHUB_OAUTH_CLIENT_SECRET = os.environ.get(
         "GITHUB_OAUTH_CLIENT_SECRET", "")
     USE_SESSION_FOR_NEXT = True
+    MAX_BOOKINGS_PER_DAY = os.environ.get("MAX_BOOKINGS", 3)
+    TIMEZONE = os.environ.get("TIMEZONE", "America/New_York")
 
 
 class TestConfig(object):
@@ -43,3 +45,5 @@ class TestConfig(object):
     GITHUB_OAUTH_CLIENT_ID = ""
     GITHUB_OAUTH_CLIENT_SECRET = ""
     USE_SESSION_FOR_NEXT = True
+    MAX_BOOKINGS_PER_DAY = os.environ.get("MAX_BOOKINGS", 3)
+    TIMEZONE = os.environ.get("TIMEZONE", "America/New_York")

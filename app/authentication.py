@@ -12,7 +12,7 @@ from flask_dance.consumer import oauth_authorized, oauth_error
 from flask_login import LoginManager, current_user, login_user
 from sqlalchemy.orm.exc import NoResultFound
 from app.errors import OAuthException
-from app.model import DB, OAuth, User
+from app.model import DB, OAuth, People
 from app.logging import LOGGER
 import os
 
@@ -68,13 +68,17 @@ def oauth_service_provider_logged_in(blueprint: Blueprint, token: str) -> bool:
     user_info = get_user_info(blueprint)
     user_id = user_info["id"]
 
-    # user user info to lookup oauth
+    # user info to lookup oauth
     oauth = get_oauth(blueprint.name, user_id, token)
     if oauth.user:
         login_user(oauth.user)
         LOGGER.info(f"{oauth.user} signed in")
     else:
-        user = User(user_info.get('email'))
+        # see email already used
+        user = People.query.filter(
+            People.email.ilike(user_info.get('email'))).one()
+        if user is None:
+            user = People(user_info.get('email'))
         # associated the player with this oauth
         oauth.user = user
         DB.session.add(user)
@@ -106,9 +110,9 @@ def oauth_service_provider_error(blueprint: Blueprint,
 
 
 @login_manager.user_loader
-def load_user(user_id: int) -> User:
+def load_user(user_id: int) -> People:
     """Loads the logged in user based upon their id."""
-    return User.query.get(int(user_id))
+    return People.query.get(int(user_id))
 
 
 def get_oauth(name: str, user_id: str, token: str) -> OAuth:
@@ -201,6 +205,7 @@ def api_user_required(f):
     """A decorator for APIs that require a logged-in user."""
     @wraps(f)
     def decorated(*args, **kwargs):
+        print(f"sdfsdf {current_user.get_id()}")
         if not are_logged_in():
             return Response("API requires logged-in user", 401)
         return f(*args, **kwargs)
