@@ -5,7 +5,7 @@ from flask import render_template, Response, request, session, redirect,\
 from flask_login import current_user
 from app.model import DB, Rink, Booking, have_booked_already
 from app.errors import NotFoundException
-from app.authentication import api_user_required
+from app.authentication import api_user_required, are_logged_in
 from app.config import Config
 from dateutil import tz
 from datetime import datetime
@@ -18,14 +18,14 @@ def rink_page(rink_id):
     rink = Rink.query.get(rink_id)
     if rink is None:
         raise NotFoundException(f"Sorry, rink not found - {rink_id}")
-
-    # check if user has already booked some slots
-    my_bookings = current_user.bookings()
     timeslots = rink.today_timeslots()
-    for i in range(0, len(timeslots)):
-        if have_booked_already(my_bookings, timeslots[i]["time"]):
-            timeslots[i]["user_booked"] = True
 
+    if are_logged_in():
+        # check if user has already booked some slots
+        my_bookings = current_user.bookings()
+        for i in range(0, len(timeslots)):
+            if have_booked_already(my_bookings, timeslots[i]["time"]):
+                timeslots[i]["user_booked"] = True
     return render_template("rink.html",
                            rink=rink,
                            status=rink.current_status(),
