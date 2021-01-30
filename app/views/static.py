@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 """holds views of static pages."""
-from flask import render_template
-from app import APP
+from flask import render_template, current_app
 
 
-@APP.route("/about")
+@current_app.route("/about")
 def about_page():
     return render_template("about.html",
                            page="page",
