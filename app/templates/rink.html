@@ -50,30 +50,31 @@
                     <h2>
                     Book an available time today:
                     </h2>
-                    <ul>
+                    <ul class="timeslots">
                         {% for timeslot in timeslots %}
-                            <li class="timeslot" id="booking{{timeslot.time}}">
-                                {% if timeslot.booked %}
-                                    <button class="btn btn-warning" disabled>
-                                        Full
-                                    </button>
-                                    {{timeslot.time}}
-                                    <i class="fa fa-lock" aria-hidden="true"></i>
-                                {% elif timeslot.user_booked %}
-                                    <button class="btn btn-info" disabled>
-                                        Booked
-                                    </button>
-                                    {{timeslot.time}}
-                                    <i class="fa fa-calendar" aria-hidden="true"></i>
-                                {% else %}
-                                    <button
-                                        onclick="book_timeslot({{timeslot.time}}, {{rink.id}})"
-                                        class="btn btn-success">
-                                        Book
-                                    </button>
-                                    {{timeslot.time}}
-                                    <i class="fa fa-clock-o" aria-hidden="true" title></i>
-                                {% endif %}
+                            <li class="timeslot">
+                                <div id="booking{{timeslot.hour}}">
+                                    {% if timeslot.booked %}
+                                        <strong>Fully booked</strong>
+                                    {% elif timeslot.user_booked %}
+                                        <strong>Booked</strong>
+                                        <i class="fa fa-check green" aria-hidden="true"></i>
+                                    {% else %}
+                                        <button
+                                            onclick="book_timeslot({{timeslot.hour}}, {{rink.id}})"
+                                            class="btn btn-success">
+                                            Book
+                                        </button>
+                                    {% endif %}
+                                </div>
+                                &nbsp;
+                                <i class="fa fa-clock-o" aria-hidden="true" title="Time"></i>
+                                {{timeslot.display}}
+                                &nbsp;
+                                <i class="fa fa-users" aria-hidden="true"></i>
+                                <sup id="bookingNumber{{timeslot.hour}}">{{timeslot.number}}</sup>
+                                &frasl;
+                                <sub>{{timeslot.capacity}}</sub>
                             </li>
                         {% endfor %}
                     </ul>
@@ -110,25 +111,33 @@
             async: true,
             success: function(booking) {
                 $(`#booking${hour}`).html(`
-                        <button class="btn btn-info" disabled>
-                            Booked
-                        </button>
-                        ${hour}
-                        <i class="fa fa-calendar" aria-hidden="true"></i>`);
+                    <strong>Booked</strong>
+                    <i class="fa fa-check green" aria-hidden="true"></i>
+                `);
+                console.log($(`#bookingNumber${hour}`).html());
+                var currentNumber = parseInt($(`#bookingNumber${hour}`).html());
+                console.log(currentNumber);
+                $(`#bookingNumber${hour}`).html( currentNumber + 1);
             }, error: function(request, error) {
                 if (request.status == 403 &&
                         request.responseJSON == "Have booked too many timeslots today") {
                     alert("Sorry you have reached your daily limit of bookings");
+                    $(`#booking${hour}`).html(`
+                        <strong>
+                            Unable to book
+                        </strong>
+                    `);
+                    $(`#bookingNumber${hour}`).html( "--");
                 } else if (request.status == 403) {
                     alert("Sorry this timeslot has been fillled");
+                    $(`#booking${hour}`).html(`
+                        <strong>
+                            Fully booked
+                        </strong>
+                    `);
+                    $(`#bookingNumber${hour}`).html( "--");
                 }
-                $(`#booking${hour}`).html(`
-                        <button class="btn btn-warning" disabled>
-                            Full
-                        </button>
-                            ${hour}
-                        <i class="fa fa-lock" aria-hidden="true"></i>`
-                );
+                
             }
         });
         

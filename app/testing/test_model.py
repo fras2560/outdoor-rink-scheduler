@@ -2,7 +2,8 @@
 """Testing various methods for the model"""
 from app.testing import client, database, some_rink, some_user,\
     today_at_noon, tomorrow_at_noon, yesterday_at_noon
-from app.model import Rink, Status, Booking, have_booked_already
+from app.model import Rink, Status, Booking, have_booked_already,\
+    get_time_today
 from datetime import datetime
 from uuid import uuid1 as uuid
 
@@ -18,7 +19,7 @@ def test_rink_model(client, database, some_rink):
 def test_get_rink_timeslots(client, database, some_rink, some_user,
                             today_at_noon):
     # test timeslots
-    timeslots = some_rink.today_timeslots()
+    timeslots = some_rink.timeslots()
     for timeslot in timeslots:
         assert timeslot['booked'] is False
 
@@ -29,7 +30,7 @@ def test_get_rink_timeslots(client, database, some_rink, some_user,
     database.session.commit()
 
     # noon is booked
-    timeslots = some_rink.today_timeslots()
+    timeslots = some_rink.timeslots()
     assert timeslots[4]['booked'] is True
 
 
@@ -80,5 +81,5 @@ def test_today_booking(client, database, some_rink, some_user,
 def test_have_booked_already(client, database, some_rink, some_user,
                              today_at_noon):
     booking = Booking(some_user, some_rink, today_at_noon)
-    assert have_booked_already([booking], 1) is False
-    assert have_booked_already([booking], 12) is True
+    assert have_booked_already([booking], get_time_today(1)) is False
+    assert have_booked_already([booking], get_time_today(12)) is True

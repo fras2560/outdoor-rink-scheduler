@@ -205,7 +205,6 @@ def api_user_required(f):
     """A decorator for APIs that require a logged-in user."""
     @wraps(f)
     def decorated(*args, **kwargs):
-        print(f"sdfsdf {current_user.get_id()}")
         if not are_logged_in():
             return Response("API requires logged-in user", 401)
         return f(*args, **kwargs)
