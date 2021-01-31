@@ -6,6 +6,7 @@ from flask_login import current_user
 from app.model import DB, Rink, Booking, have_booked_already
 from app.errors import NotFoundException
 from app.authentication import api_user_required, are_logged_in
+from app.helpers import get_time_today
 from app.config import Config
 from dateutil import tz
 from datetime import datetime
@@ -18,13 +19,14 @@ def rink_page(rink_id):
     rink = Rink.query.get(rink_id)
     if rink is None:
         raise NotFoundException(f"Sorry, rink not found - {rink_id}")
-    timeslots = rink.today_timeslots()
+    timeslots = rink.timeslots()
 
+    # check if user has already booked some slots
     if are_logged_in():
-        # check if user has already booked some slots
         my_bookings = current_user.bookings()
         for i in range(0, len(timeslots)):
-            if have_booked_already(my_bookings, timeslots[i]["time"]):
+            if have_booked_already(my_bookings, timeslots[i]["start"],
+                                   end=timeslots[i]["end"]):
                 timeslots[i]["user_booked"] = True
     return render_template("rink.html",
                            rink=rink,
@@ -50,12 +52,12 @@ def book_timeslot():
     if rink is None:
         return Response(json.dumps(f"{rink_id}: Rink not found"),
                         status=404, mimetype="application/json")
-    rink_timeslot = rink.timeslot_today(hour)
+    rink_timeslot = rink.timeslots(hour=hour)[0]
     my_bookings = current_user.bookings()
     # ensure there is capacity and able to book
     if rink_timeslot['booked']:
         return Response(json.dumps("Timeslot booked already"), 409)
-    elif have_booked_already(my_bookings, hour):
+    elif have_booked_already(my_bookings, get_time_today(hour)):
         return Response(json.dumps("Have already booked this timeslot"), 403)
     elif len(my_bookings) >= Config.MAX_BOOKINGS_PER_DAY:
         return Response(json.dumps("Have booked too many timeslots today"),

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Holds a database model for the application."""
 from app.logging import LOGGER
-from app.helpers import get_time_today
+from app.helpers import get_time_today, localize_date
 from flask_sqlalchemy import SQLAlchemy
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
 from flask_login import UserMixin
@@ -14,27 +14,38 @@ from datetime import datetime, timedelta
 DB = SQLAlchemy()
 
 
-def have_booked_already(bookings: list, hour: int) -> bool:
+def have_booked_already(bookings: list, start: datetime,
+                        end: datetime = None) -> bool:
     """Returns whether have already booked for given hour"""
     for booking in bookings:
-        if booking.json()['hour'] == hour:
+        if (end is None and booking.get_start() <= start and
+                booking.get_end() >= start):
+            return True
+        elif (end is not None and booking.get_start() <= end and
+              booking.get_end() >= start):
             return True
     return False
 
 
 class Timeslot(TypedDict):
     """Information about a timeslot for a given rink."""
-    time: int
+    start: datetime
+    end: datetime
+    display: str
     booked: bool
     number: int
     capacity: int
     user_booked: bool
 
     @staticmethod
-    def empty_timeslot(time: int, capacity: int) -> 'Timeslot':
+    def empty_timeslot(start: datetime, end: datetime,
+                       capacity: int) -> 'Timeslot':
         """Returns an empty rink timeslot."""
         return {
-            "time": time,
+            "start": start,
+            "end": end,
+            "hour": int(start.strftime("%H")),
+            "display": start.strftime("%H:%M") + " - " + end.strftime("%H:%M"),
             "booked": False,
             "number": 0,
             "capacity": capacity,
@@ -100,32 +111,43 @@ class Rink(DB.Model):
                 return status
         return None
 
-    def today_timeslots(self) -> list:
-        """Returns a list of todays timeslots"""
-        timeslots = {}
-        for time in range(self.open, self.close):
-            timeslots[time] = Timeslot.empty_timeslot(time, self.capacity)
-        for booking in self.today_bookings():
-            hour = booking.json()['hour']
-            if hour in timeslots.keys():
-                Timeslot.add_booking(timeslots[hour])
-            else:
-                LOGGER.warn("Booking outside of standard hours")
-        return sorted(timeslots.values(),
-                      key=lambda timeslot: timeslot['time'])
+    def timeslots(self, hour: int = -1) -> list:
+        """Returns list of timeslots todays
 
-    def timeslot_today(self, hour: int) -> Timeslot:
-        """Returns a time slot for the given hour today"""
-        timeslot = Timeslot.empty_timeslot(hour, self.capacity)
-        for booking in self.today_bookings():
-            if booking.json()['hour'] == hour:
+        If given a hour then timeslot is specific to the hour given.
+
+        Args:
+            hour (int, optional): the hour of the timeslot.
+                Default all timeslots
+        Returns:
+            list: a list of timeslots
+        """
+        timeslots = []
+        if hour == -1:
+            for time in range(self.open, self.close):
+                start = get_time_today(time)
+                end = get_time_today(time, minute=59)
+                timeslot = Timeslot.empty_timeslot(start, end, self.capacity)
+                for booking in self.today_bookings(time):
+                    Timeslot.add_booking(timeslot)
+                timeslots.append(timeslot)
+            return timeslots
+        else:
+            start = get_time_today(hour)
+            end = get_time_today(hour, minute=59)
+            timeslot = Timeslot.empty_timeslot(start, end, self.capacity)
+            for booking in self.today_bookings(hour):
                 Timeslot.add_booking(timeslot)
-        return timeslot
+            return [timeslot]
 
-    def today_bookings(self) -> list:
+    def today_bookings(self, hour: int = -1) -> list:
         """Returns the booking for the rink today"""
-        start_of_today = get_time_today(0)
-        end_of_today = get_time_today(23, minute=59)
+        if hour == -1:
+            start_of_today = get_time_today(0)
+            end_of_today = get_time_today(23, minute=59)
+        else:
+            start_of_today = get_time_today(hour)
+            end_of_today = get_time_today(hour, minute=59)
         today_bookings = self.bookings.filter(
             and_(Booking.rink_id == self.id,
                  Booking.start_date.between(start_of_today, end_of_today))
@@ -287,13 +309,22 @@ class Booking(DB.Model):
         self.user = user
         self.start_date = start_date
         self.group_size = group_size
-        self.end_date = start_date + timedelta(hours=1)
+        self.end_date = start_date + timedelta(minutes=59)
+
+    def get_start(self) -> datetime:
+        """Returns the start date of the booking"""
+        return localize_date(self.start_date)
+
+    def get_end(self) -> datetime:
+        """Returns the end date of the booking"""
+        return localize_date(self.end_date)
 
     def json(self) -> dict:
         return {
             "rink": self.rink.json(),
             "user": self.user.json(),
             "start_date": self.start_date.strftime("%Y-%m-%d %H:%M"),
+            "end_date": self.end_date.strftime("%Y-%m-%d %H:%M"),
             "group_size": self.group_size,
             "id": self.id,
             'time': self.start_date.strftime("%H:%M"),

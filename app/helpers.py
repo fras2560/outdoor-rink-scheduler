@@ -21,3 +21,8 @@ def get_time_today(hour: int, minute: int = 0) -> datetime:
     return datetime(today.year, today.month, today.day,
                     hour=hour, minute=minute,
                     tzinfo=tz.gettz(current_app.config["TIMEZONE"]))
+
+
+def localize_date(some_date: datetime):
+    """Returns a localized a date"""
+    return some_date.replace(tzinfo=tz.gettz(current_app.config["TIMEZONE"]))
