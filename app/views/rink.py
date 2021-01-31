@@ -3,11 +3,12 @@
 from flask import render_template, Response, request, session, redirect,\
     url_for, current_app
 from flask_login import current_user
-from app.model import DB, Rink, Booking, have_booked_already
-from app.errors import NotFoundException
 from app.authentication import api_user_required, are_logged_in
-from app.helpers import get_time_today
 from app.config import Config
+from app.logging import LOGGER
+from app.errors import NotFoundException
+from app.helpers import get_time_today
+from app.model import DB, Rink, Booking, have_booked_already
 from dateutil import tz
 from datetime import datetime
 import json
@@ -69,4 +70,6 @@ def book_timeslot():
     booking = Booking(current_user, rink, start_date=booking_time)
     DB.session.add(booking)
     DB.session.commit()
+    LOGGER.info(
+        f"{current_user} booked {booking.rink.name} at {booking.start_date}")
     return Response(json.dumps(booking.json()), 200)

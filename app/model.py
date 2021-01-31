@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """Holds a database model for the application."""
-from app.logging import LOGGER
 from app.helpers import get_time_today, localize_date
 from flask_sqlalchemy import SQLAlchemy
 from flask_dance.consumer.storage.sqla import OAuthConsumerMixin
