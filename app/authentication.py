@@ -76,7 +76,7 @@ def oauth_service_provider_logged_in(blueprint: Blueprint, token: str) -> bool:
     else:
         # see email already used
         user = People.query.filter(
-            People.email.ilike(user_info.get('email'))).one()
+            People.email.ilike(user_info.get('email'))).first()
         if user is None:
             user = People(user_info.get('email'))
         # associated the player with this oauth
