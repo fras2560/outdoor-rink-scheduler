@@ -1,10 +1,10 @@
 {% extends "simple-sidebar-template.html" %}
 {% block content %}
 <h1 data-cy="welcomeHeader">
-    Welcome to  KW rink scheduler
+    Welcome to Kitchener Outdoor Rinks
 </h1>
 <p>
-  Select a rink to see its status and book a skating time.
+  Select a rink to see its status and how busy it is.
   <ul data-cy="listOfRinks">
     {% for rink in rinks %}
       <li data-cy="rink{{rink.id}}">
