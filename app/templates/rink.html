@@ -24,13 +24,13 @@
                 {{status.description}}
                 <br>
                 <small>
-                    Last updated: {{status.start_date}}
+                    Last updated: {{status.start_date.strftime('%Y-%m-%d %H:%M')}}
                 </small>
             </p>
         {% endif %}
     </center>
     <div class="row">
-        <div class="col-sm-6" style="min-height: 400px;">
+        <div class="col-sm-12" style="min-height: 400px;">
             <iframe
                 src="{{ rink.map_link|safe }}"
                 width="100%"
@@ -44,7 +44,7 @@
                 title="Google Map">
             </iframe>
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-12 pt-5">
             <center>
                 {% if current_user.is_authenticated and (status is none or status.open) %}
                     <h2>
